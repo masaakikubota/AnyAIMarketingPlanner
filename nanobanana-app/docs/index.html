@@ -61,6 +61,7 @@
       <span class="tag">Gemini 2.5 Pro → 2.5 Flash Image</span>
       <span class="pill">GitHub Pages OK</span>
       <span class="pill">最大30枚の参照画像</span>
+      <span id="apiPill" class="pill warn">API: mock mode</span>
     </header>
 
     <section class="panel" aria-labelledby="s1h">
@@ -145,7 +146,30 @@
 
   <script>
     // ====== 設定 ======
-    const API_BASE_URL = ""; // 例: "https://your-proxy.example.com"（空ならモック動作）
+    // API ベースURLはクエリ (?api=https://your-proxy.example.com) または localStorage を優先
+    const API_BASE_URL = (()=>{
+      try{
+        const u = new URL(location.href);
+        const q = (u.searchParams.get('api')||'').trim();
+        if(q){
+          localStorage.setItem('NB_API_BASE_URL', q);
+          return q;
+        }
+        return localStorage.getItem('NB_API_BASE_URL') || '';
+      }catch(e){ return ''; }
+    })();
+
+    // ヘッダーにAPI状態を表示
+    (function(){
+      const el = document.getElementById('apiPill');
+      if(!el) return;
+      if(API_BASE_URL){
+        try{ el.textContent = 'API: ' + new URL(API_BASE_URL).host; el.classList.add('ok'); el.classList.remove('warn'); }
+        catch{ el.textContent = 'API: ' + API_BASE_URL; el.classList.add('ok'); el.classList.remove('warn'); }
+      } else {
+        el.textContent = 'API: mock mode'; el.classList.remove('ok'); el.classList.add('warn');
+      }
+    })();
 
     function updateProgress(msg){ const el=document.getElementById('progress'); if(el) el.textContent = msg; }
 
