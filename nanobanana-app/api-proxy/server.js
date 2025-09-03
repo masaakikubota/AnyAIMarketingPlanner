@@ -20,6 +20,11 @@ if (!GEMINI_KEY) {
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
 
+// ---- health check ----
+app.get('/health', (req, res) => {
+  res.json({ ok: true, service: 'nanobanana-api-proxy' });
+});
+
 // ---- /prompt (Phase2: 質問→最終プロンプト; JSON限定) ----
 app.post("/prompt", async (req, res) => {
   const { systemPrompt, metaPrompt, input, answers } = req.body;
